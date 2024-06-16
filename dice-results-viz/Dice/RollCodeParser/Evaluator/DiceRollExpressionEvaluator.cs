@@ -4,10 +4,6 @@ namespace Dice.RollCodeParser;
 
 public static class DiceRollExpressionEvaluator
 {
-	public static void ApplyDiceRollExpression(this DiceRoll roll, DiceRollExpression dre)
-	{
-		
-	}
 
 	//assumes faces 1 to highestFace
 	public static void ApplyEvenDistributionFacesForNormalDice(this DiceRoll roll, int highestFace)
