@@ -1,0 +1,69 @@
+﻿@page "/"
+@rendermode InteractiveWebAssembly
+@using Dice.RollCodeParser
+@using Dice.RollCodeParser.RollDescription
+
+<PageTitle>Dice</PageTitle>
+
+<h1>Dice Results Vizualizer</h1>
+
+
+<form method="post" @onsubmit="ParseDice" @formname="dice-form">
+    <AntiforgeryToken/>
+    <div>
+        <label>
+            Identifier:
+            <InputText @bind-Value="UserInput!.Input"/>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Parse</button>
+    </div>
+</form>
+
+<hr/>
+<div class=results>
+    <ApexChart Title="Result" TItem="Result">
+        <ApexPointSeries TItem="Result"
+                         Items="SResults"
+                         Name="Roll"
+                         SeriesType="SeriesType.Bar"
+                         XValue="e => e.FaceValue"
+                         YValue="e=> e.Probability"/>
+    </ApexChart>
+</div>
+
+@code {
+    public DiceUserInput? UserInput { get; set; }
+    public List<Result> SResults;
+    protected override void OnInitialized()
+    {
+        SResults = new List<Result>();
+        UserInput = new DiceUserInput();
+        if (UserInput.Input == null)
+        {
+           return;
+        }
+
+    }
+
+    private void ParseDice()
+    {
+        if (UserInput == null || UserInput.Input == null)
+        {
+            return;
+        }
+        
+        var rc = new RollCode(UserInput.Input);
+        //if rc.HasError...
+        SResults = rc.Result.GetResults();
+        Console.WriteLine("Update needed: " + SResults.Count);
+
+        StateHasChanged();
+    }
+
+    public class DiceUserInput
+    {
+        public string? Input;
+    }
+}
