@@ -4,7 +4,7 @@ public class Result
 {
 	public int FaceValue;
 	public int Probability;
-
+	public decimal Odds;
 	public Result(int faceValue)
 	{
 		FaceValue = faceValue;

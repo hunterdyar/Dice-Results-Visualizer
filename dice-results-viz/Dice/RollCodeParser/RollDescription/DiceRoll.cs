@@ -3,7 +3,8 @@
 public class DiceRoll
 {
 	private Dictionary<int, Result> _faceMap = new Dictionary<int, Result>();
-
+	public int TotalImaginaryRollCount() => _faceMap.Values.Sum(x => x.Probability);
+	
 	public void AddResult(Result r)
 	{
 		if(_faceMap.TryGetValue(r.FaceValue, out var existing))
@@ -17,6 +18,7 @@ public class DiceRoll
 
 	public List<Result> GetResults()
 	{
+		CalculateOdds();
 		if (_faceMap.Count == 0)
 		{
 			return new List<Result>();
@@ -25,7 +27,16 @@ public class DiceRoll
 		results.Sort((x,y)=>x.FaceValue - y.FaceValue);
 		return results;
 	}
-	
+
+	private void CalculateOdds()
+	{
+		int total = TotalImaginaryRollCount();
+		foreach (var kvp in _faceMap)
+		{
+			kvp.Value.Odds = kvp.Value.Probability / (decimal)total;
+		}
+	}
+
 	public void MergeDiceRoll(DiceRoll other)
 	{
 		//Turn two lists into one list of the sums.

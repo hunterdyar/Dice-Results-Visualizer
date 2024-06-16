@@ -16,4 +16,10 @@
       <Folder Include="Dice\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.5\Microsoft.AspNetCore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
