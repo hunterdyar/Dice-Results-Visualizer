@@ -20,15 +20,8 @@ namespace Dice.RollCodeParser
 			_parser.Parse();
 			_evaluator = new Evaluator();
 			Result = _evaluator.Evaluate(_parser.Expressions);
-			Console.WriteLine($"Parsed as: {_parser.ToString()}");
 		}
-
-		public void Evaluate()
-		{
-			//parse through tree and pass in appropriate delegate to handle different types of functions? 
-			//chain the callbacks along or have a master callback that sorts?
-		}
-
+		
 		private List<Token> Tokenize(string s)
 		{
 			s = s.Trim().ToLower();

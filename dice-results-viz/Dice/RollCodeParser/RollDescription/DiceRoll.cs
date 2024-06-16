@@ -98,10 +98,12 @@ public class DiceRoll
 
 	public void ShiftAllFaces(int delta)
 	{
+		Console.WriteLine($"Shift {_faceMap.Count} faces by {delta}");
 		if (delta == 0)
 		{
 			return;
 		}
+		
 		var myRes = GetResults();
 		//0d0+3 = 3?
 		if (myRes.Count == 0)
@@ -114,7 +116,7 @@ public class DiceRoll
 		{
 			//todo: wait, didn't i turn results into classes instead of structs?
 			//ah well this is silly slow.
-			AddResult(new Result(r.FaceValue+delta));
+			AddResult(new Result(r.FaceValue+delta,r.Probability));
 		}
 	}
 

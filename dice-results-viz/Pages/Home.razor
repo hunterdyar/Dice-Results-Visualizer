@@ -11,12 +11,12 @@
     <AntiforgeryToken/>
     <div>
         <label>
-            Identifier:
+            Dice Notation:
             <InputText @bind-Value="UserInput!.Input"/>
         </label>
     </div>
     <div>
-        <button type="submit">Parse</button>
+        <button type="submit">Evaluate</button>
     </div>
 </form>
 
@@ -26,10 +26,10 @@
         <ApexPointSeries TItem="Result"
                          Items="SResults"
                          Name="Odds"
-                         
                          SeriesType="SeriesType.Bar"
                          XValue="e => e.FaceValue"
-                         YValue="e=> e.Odds*100"/>
+                         YValue="e=> e.Odds*100"
+                         />
     </ApexChart>
 </div>
 
@@ -56,7 +56,6 @@
         var rc = new RollCode(UserInput.Input);
         //if rc.HasError...
         SResults = rc.Result.GetResults();
-        
         Console.WriteLine("Update needed: " + SResults.Count);
         StateHasChanged();
         await _chart.RenderAsync();

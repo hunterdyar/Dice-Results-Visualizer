@@ -14,24 +14,27 @@ namespace Dice.RollCodeParser
 			return roll;
 		}
 
-		public void Evaluate(Expression exp, ref DiceRoll roll) 
+		public void Evaluate(Expression exp, ref DiceRoll roll)
 		{
 			if (exp is DiceRollExpression dre)
 			{
 				int numDice = GetValueFromExpression(dre.NumberDice);
 				int numFace = GetValueFromExpression(dre.NumberFaces);
 				roll.ApplyNormalDiceRollExpression(numDice, numFace);
-			}else if (exp is ModifierExpression mod)
+			}
+			else if (exp is ModifierExpression mod)
 			{
 				int val = GetValueFromExpression(mod.Expression);
-				roll.ApplyModifier(mod.Modifier,val);
-			}else if (exp is ExpressionGroup group)
+				roll.ApplyModifier(mod.Modifier, val);
+			}
+			else if (exp is ExpressionGroup group)
 			{
 				DiceRoll subRoll = new DiceRoll();
 				foreach (var expression in group.Expressions)
 				{
 					Evaluate(expression, ref subRoll);
 				}
+
 				roll.CombineWithOtherRoll(subRoll, Modifier.Add);
 			}
 			else
@@ -39,11 +42,6 @@ namespace Dice.RollCodeParser
 				Console.WriteLine("Invalid Root Expression");
 			}
 		}
-
-		// private static int DefaultRoll(int numFaces)
-		// {
-		// 	return Random.Range(1, numFaces + 1);
-		// }
 
 		public int GetValueFromExpression(Expression exp)
 		{
@@ -60,6 +58,7 @@ namespace Dice.RollCodeParser
 			else
 			{
 				//todo: We have to yield here!
+				//(2+2) should become 4.
 				//we need to make some kind of ... thing for this...
 				throw new ArgumentException($"Not supporting expressions that aren't numbers, yet. ({exp.ToString()})");
 			}

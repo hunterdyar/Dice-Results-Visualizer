@@ -62,7 +62,7 @@ namespace Dice.RollCodeParser
 
 		private Expression ParseLabelToken()
 		{
-			var left = PopLeftExpressionOrError();
+			var left = PopLeftExpressionOrNull();
 			_pos++;//consume the [
 			
 			if (_tokens[_pos].TType != RollTokenType.StringLiteral)
@@ -98,7 +98,7 @@ namespace Dice.RollCodeParser
 
 		private Expression ParseKeepToken()
 		{
-			var left = PopLeftExpressionOrError();
+			var left = PopLeftExpressionOrNull();
 			if (left is DiceRollExpression dre)
 			{
 				_pos++;
@@ -117,7 +117,7 @@ namespace Dice.RollCodeParser
 
 		private Expression ParseExplodeToken()
 		{
-			var left = PopLeftExpressionOrError();
+			var left = PopLeftExpressionOrNull();
 			if (left is DiceRollExpression dre)
 			{
 				dre.Exploding = true;
@@ -134,7 +134,7 @@ namespace Dice.RollCodeParser
 			return left;
 		}
 
-		private Expression PopLeftExpressionOrError()
+		private Expression PopLeftExpressionOrNull()
 		{
 			//get previous expression
 			Expression left;
@@ -153,13 +153,18 @@ namespace Dice.RollCodeParser
 				return left;
 			}
 
-			Console.WriteLine("Unable to pull left expression! invalid syntax.");
 			return null;
 		}
 		private Expression ParseDiceToken()
 		{
-
-			Expression left = PopLeftExpressionOrError();
+			Expression left = PopLeftExpressionOrNull();
+			
+			if(left == null){
+				left = new NumberExpression()
+				{
+					Value = 1,
+				};
+			}
 			//2d20d2 is roll 2d20 and drop the lowest 2 results.
 			if (left is DiceRollExpression existingDRE)
 			{
