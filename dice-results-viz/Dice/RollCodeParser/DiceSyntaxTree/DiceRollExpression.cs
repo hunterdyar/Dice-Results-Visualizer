@@ -9,6 +9,25 @@
 		public Expression Keep = null;
 		public bool Exploding { get; set; }
 
+		public DiceRollExpression()
+		{
+			
+		}
+
+		public DiceRollExpression(Expression numDice, Expression faces)
+		{
+			this.NumberDice = numDice;
+			this.NumberFaces = faces;
+		}
+
+		public DiceRollExpression(Expression numDice, Expression faces, Expression drop, Expression keep)
+		{
+			this.NumberDice = numDice;
+			this.NumberFaces = faces;
+			this.Drop = drop;
+			this.Keep = keep;
+		}
+		
 		public override string ToString()
 		{
 			if (Drop == null && Keep == null)
