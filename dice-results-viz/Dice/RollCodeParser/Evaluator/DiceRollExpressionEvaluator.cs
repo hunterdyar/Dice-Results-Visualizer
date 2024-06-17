@@ -6,21 +6,37 @@ public static class DiceRollExpressionEvaluator
 {
 
 	//assumes faces 1 to highestFace
-	public static void ApplyEvenDistributionFacesForNormalDice(this DiceRoll roll, int highestFace)
+	public static void ApplyEvenDistributionFacesForNormalDice(this DiceRoll roll, DiceRoll highestFace)
 	{
-		for (int i = 1; i <= highestFace; i++)
+		foreach (var face in highestFace.GetResults())
 		{
-			roll.AddResult(new Result(i,1));
+			for (int j = 0; j < face.Chances; j++)
+			{
+				for (int i = 1; i <= face.FaceValue; i++)
+				{
+					roll.AddResult(new Result(i, 1));
+				}
+			}
 		}
+		// for (int i = 1; i <= highestFace; i++)
+		// {
+		// 	roll.AddResult(new Result(i,1));
+		// }
 	}
 
-	public static void ApplyNormalDiceRollExpression(this DiceRoll roll, int numberDice, int highestFace)
+	public static void ApplyNormalDiceRollExpression(this DiceRoll roll, DiceRoll numberDice, DiceRoll highestFace)
 	{
-		for (int i = 1; i <= numberDice; i++)
+		foreach (var dice in numberDice.GetResults())
 		{
-			DiceRoll nRoll = new DiceRoll();
-			nRoll.ApplyEvenDistributionFacesForNormalDice(highestFace);
-			roll.CombineWithOtherRoll(nRoll);
+			for (int j = 0; j < dice.Chances; j++)
+			{
+				for (int i = 1; i <= dice.FaceValue; i++)
+				{
+					DiceRoll nRoll = new DiceRoll();
+					nRoll.ApplyEvenDistributionFacesForNormalDice(highestFace);
+					roll.CombineWithOtherRoll(nRoll);
+				}
+			}
 		}
 	}
 }

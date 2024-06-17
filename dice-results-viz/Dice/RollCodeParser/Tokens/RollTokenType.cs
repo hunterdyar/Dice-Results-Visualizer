@@ -14,5 +14,7 @@
 		LabelOpen,
 		LabelClose,
 		StringLiteral,
+		GroupOpen,
+		GroupClose,
 	}
 }

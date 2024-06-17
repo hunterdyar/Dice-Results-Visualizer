@@ -19,7 +19,7 @@ namespace Dice.RollCodeParser
 			Expressions.Clear();
 			while (_pos < _tokens.Count)
 			{
-				Expressions.Add(ParseNextToken());
+				Expressions.Add(ParseNextToken(Expressions.Count > 0 ? Expressions[^1] : null));
 			}
 		}
 
@@ -34,35 +34,63 @@ namespace Dice.RollCodeParser
 			return s.ToString();
 		}
 
-		private Expression ParseNextToken()
+		private Expression ParseNextToken(Expression? left)
 		{
 			var token = _tokens[_pos];
 			switch (token.TType)
 			{
 				case RollTokenType.Number:
-					var n = ParseNumberToken();
+					var n = ParseNumberToken(left);
 					return n;	
 				case RollTokenType.Add:
 				case RollTokenType.Divide:
 				case RollTokenType.Multiply:
 				case RollTokenType.Subtract:
-					return ParseModifierToken();
+					return ParseModifierToken(left);
 				case RollTokenType.DiceSep:
-					return ParseDiceToken();
+					return ParseDiceToken(left);
 				case RollTokenType.Explode:
-					return ParseExplodeToken();
+					return ParseExplodeToken(left);
 				case RollTokenType.Keep:
-					return ParseKeepToken();
+					return ParseKeepToken(left);
 				case RollTokenType.LabelOpen:
-					return ParseLabelToken();
+					return ParseLabelToken(left);
+				case RollTokenType.GroupOpen:
+					return ParseGroup(left);
 			}
 
 			return null;
 		}
 
-		private Expression ParseLabelToken()
+		//todo: This is completely broken, need to redo the parser entirely to be more robust, instead of continuing to try to hack on top of this thing.
+		private Expression ParseGroup(Expression? left)
 		{
-			var left = PopLeftExpressionOrNull();
+			_pos++;
+			ExpressionGroup expressionGroup = new ExpressionGroup();
+			while (_tokens[_pos].TType != RollTokenType.GroupClose)
+			{
+				if (expressionGroup.Expressions.Count == 0)
+				{
+					expressionGroup.Expressions.Add(ParseNextToken(null));
+				}
+				else
+				{
+					expressionGroup.Expressions.Add(ParseNextToken(expressionGroup.Expressions[^1]));
+				}
+
+				_pos++;
+				if (_pos >= _tokens.Count)
+				{
+					break;
+				}
+			}
+
+			_pos++;//consume the )
+			return expressionGroup;
+		}
+
+		private Expression ParseLabelToken(Expression? left)
+		{
 			_pos++;//consume the [
 			
 			if (_tokens[_pos].TType != RollTokenType.StringLiteral)
@@ -96,13 +124,12 @@ namespace Dice.RollCodeParser
 			return left;
 		}
 
-		private Expression ParseKeepToken()
+		private Expression ParseKeepToken(Expression left)
 		{
-			var left = PopLeftExpressionOrNull();
 			if (left is DiceRollExpression dre)
 			{
 				_pos++;
-				dre.Keep = ParseNextToken();
+				dre.Keep = ParseNextToken(null);//todo: this is ... null, right? new "sub" expression?
 				return dre;
 			}
 			else
@@ -115,9 +142,8 @@ namespace Dice.RollCodeParser
 			return left;
 		}
 
-		private Expression ParseExplodeToken()
+		private Expression ParseExplodeToken(Expression left)
 		{
-			var left = PopLeftExpressionOrNull();
 			if (left is DiceRollExpression dre)
 			{
 				dre.Exploding = true;
@@ -134,31 +160,29 @@ namespace Dice.RollCodeParser
 			return left;
 		}
 
-		private Expression PopLeftExpressionOrNull()
+		// private Expression PopLeftExpressionOrNull()
+		// {
+		// 	//get previous expression
+		// 	Expression left;
+		// 	if (Expressions.Count == 0)
+		// 	{
+		// 		//"d4" should become "1d4".
+		// 		left = new NumberExpression()
+		// 		{
+		// 			Value = 1,
+		// 		};
+		// 	}
+		// 	else
+		// 	{
+		// 		left = Expressions[^1];
+		// 		Expressions.Remove(left);
+		// 		return left;
+		// 	}
+		//
+		// 	return null;
+		// }
+		private Expression ParseDiceToken(Expression left)
 		{
-			//get previous expression
-			Expression left;
-			if (Expressions.Count == 0)
-			{
-				//"d4" should become "1d4".
-				left = new NumberExpression()
-				{
-					Value = 1,
-				};
-			}
-			else
-			{
-				left = Expressions[^1];
-				Expressions.Remove(left);
-				return left;
-			}
-
-			return null;
-		}
-		private Expression ParseDiceToken()
-		{
-			Expression left = PopLeftExpressionOrNull();
-			
 			if(left == null){
 				left = new NumberExpression()
 				{
@@ -169,7 +193,7 @@ namespace Dice.RollCodeParser
 			if (left is DiceRollExpression existingDRE)
 			{
 				_pos++;
-				existingDRE.Drop = ParseNextToken();
+				existingDRE.Drop = ParseNextToken(null);
 				return existingDRE;
 			}
 			
@@ -177,11 +201,11 @@ namespace Dice.RollCodeParser
 			//consume the sep
 			_pos++;
 			dre.NumberDice = left;
-			dre.NumberFaces = ParseNextToken();
+			dre.NumberFaces = ParseNextToken(null);
 			return dre;
 		}
 
-		private Expression ParseModifierToken()
+		private Expression ParseModifierToken(Expression left)
 		{
 			var token = _tokens[_pos];
 			var modifier = new ModifierExpression();
@@ -200,11 +224,11 @@ namespace Dice.RollCodeParser
 			}
 			//consume the token.
 			_pos++;
-			modifier.Expression = ParseNextToken();
+			modifier.Expression = ParseNextToken(left);
 			return modifier;
 		}
 
-		private Expression ParseNumberToken()
+		private Expression ParseNumberToken(Expression left)
 		{
 			var token = _tokens[_pos];
 			if (token is NumberToken nt)

@@ -22,14 +22,14 @@
 
 <hr/>
 <div class=results id="resultGraph">
-    <ApexChart @ref="_chart" Title="Result" TItem="Result">
+    <ApexChart @ref="_chart" Title="Result" TItem="Result" Options="_options">
         <ApexPointSeries TItem="Result"
                          Items="SResults"
                          Name="Odds"
                          SeriesType="SeriesType.Bar"
                          XValue="e => e.FaceValue"
                          YValue="e=> e.Odds*100"
-                         />
+        />
     </ApexChart>
 </div>
 
@@ -37,6 +37,7 @@
     public DiceUserInput? UserInput { get; set; }
     public List<Result> SResults;
     private ApexChart<Result> _chart;
+    private ApexChartOptions<Result> _options;
     protected override void OnInitialized()
     {
         UserInput = new DiceUserInput();
@@ -44,6 +45,15 @@
         {
            return;
         }
+
+        _options = new ApexChartOptions<Result>()
+        {
+            Theme = new Theme()
+            {
+                Mode = Mode.Dark,
+                Palette = PaletteType.Palette9
+            }
+        };
     }
 
     private async Task ParseDice()
@@ -56,7 +66,6 @@
         var rc = new RollCode(UserInput.Input);
         //if rc.HasError...
         SResults = rc.Result.GetResults();
-        Console.WriteLine("Update needed: " + SResults.Count);
         StateHasChanged();
         await _chart.RenderAsync();
     }

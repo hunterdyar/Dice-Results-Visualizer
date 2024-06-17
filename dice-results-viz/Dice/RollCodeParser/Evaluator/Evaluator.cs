@@ -6,41 +6,59 @@ namespace Dice.RollCodeParser
 	{
 		public DiceRoll Evaluate(List<Expression> expressions)
 		{
-			DiceRoll roll = new DiceRoll();
+			DiceRoll final = new DiceRoll();
 			foreach (var expr in expressions)
 			{ 
-				Evaluate(expr, ref roll);
+				var newRoll = Evaluate(expr);
+				final.CombineWithOtherRoll(newRoll);
 			}
-			return roll;
+			return final;
 		}
 
-		public void Evaluate(Expression exp, ref DiceRoll roll)
+		public DiceRoll Evaluate(Expression exp)
 		{
 			if (exp is DiceRollExpression dre)
 			{
-				int numDice = GetValueFromExpression(dre.NumberDice);
-				int numFace = GetValueFromExpression(dre.NumberFaces);
+				var roll = new DiceRoll();
+				var numDice = Evaluate(dre.NumberDice);
+				var numFace = Evaluate(dre.NumberFaces);
 				roll.ApplyNormalDiceRollExpression(numDice, numFace);
+				return roll;
 			}
 			else if (exp is ModifierExpression mod)
 			{
-				int val = GetValueFromExpression(mod.Expression);
-				roll.ApplyModifier(mod.Modifier, val);
+				var roll = new DiceRoll();
+				roll.ApplyModifier(mod.Modifier,Evaluate(mod.Expression));
+				return roll;
 			}
 			else if (exp is ExpressionGroup group)
 			{
+				//a lot of (parenthesis) are just for op order disambiguation
+				if (group.Expressions.Count == 1)
+				{
+					return Evaluate(group.Expressions[0]);
+				}
+				
 				DiceRoll subRoll = new DiceRoll();
 				foreach (var expression in group.Expressions)
 				{
-					Evaluate(expression, ref subRoll);
+					var newRoll = Evaluate(expression);
+					subRoll.CombineWithOtherRoll(newRoll);
 				}
-
-				roll.CombineWithOtherRoll(subRoll, Modifier.Add);
+				return subRoll;
+			}else if (exp is NumberExpression num)
+			{
+				//Handle if we just wrote "7"
+				var roll = new DiceRoll(); 
+				roll.ShiftAllFaces(num.Value);
+				return roll;
 			}
 			else
 			{
 				Console.WriteLine("Invalid Root Expression");
 			}
+
+			return null;
 		}
 
 		public int GetValueFromExpression(Expression exp)

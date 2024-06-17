@@ -99,6 +99,12 @@ namespace Dice.RollCodeParser
 				case ']':
 					tokens.Add(new Token(RollTokenType.LabelClose,c));
 					continue;
+				case '(':
+					tokens.Add(new Token(RollTokenType.GroupOpen, c));
+					continue;
+				case ')':
+					tokens.Add(new Token(RollTokenType.GroupClose, c));
+					continue;
 				default:
 					Console.Error.WriteLine($"Unexpected character {c}");
 					continue;

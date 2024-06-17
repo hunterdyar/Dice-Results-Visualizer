@@ -1,15 +1,18 @@
-﻿namespace Dice.RollCodeParser.RollDescription;
+﻿using System.Text;
+
+namespace Dice.RollCodeParser.RollDescription;
 
 public class DiceRoll
 {
 	private Dictionary<int, Result> _faceMap = new Dictionary<int, Result>();
-	public int TotalImaginaryRollCount() => _faceMap.Values.Sum(x => x.Probability);
+	public int TotalImaginaryRollCount() => _faceMap.Values.Sum(x => x.Chances);
 	
 	public void AddResult(Result r)
 	{
+		
 		if(_faceMap.TryGetValue(r.FaceValue, out var existing))
 		{
-			existing.IncrementProbabilty(r.Probability);
+			existing.IncrementChances(r.Chances);
 		}else
 		{
 			_faceMap.Add(r.FaceValue,r);
@@ -33,7 +36,7 @@ public class DiceRoll
 		int total = TotalImaginaryRollCount();
 		foreach (var kvp in _faceMap)
 		{
-			kvp.Value.Odds = kvp.Value.Probability / (decimal)total;
+			kvp.Value.Odds = kvp.Value.Chances / (decimal)total;
 		}
 	}
 
@@ -65,11 +68,11 @@ public class DiceRoll
 		_faceMap.Clear();
 		foreach (var or in otherRes)
 		{
-			for (int i = 0; i < or.Probability; i++)
+			for (int i = 0; i < or.Chances; i++)
 			{
 				foreach (var r in myRes)
 				{
-					for (int j = 0; j < r.Probability; j++)
+					for (int j = 0; j < r.Chances; j++)
 					{
 						switch (mod)
 						{
@@ -98,7 +101,6 @@ public class DiceRoll
 
 	public void ShiftAllFaces(int delta)
 	{
-		Console.WriteLine($"Shift {_faceMap.Count} faces by {delta}");
 		if (delta == 0)
 		{
 			return;
@@ -116,7 +118,7 @@ public class DiceRoll
 		{
 			//todo: wait, didn't i turn results into classes instead of structs?
 			//ah well this is silly slow.
-			AddResult(new Result(r.FaceValue+delta,r.Probability));
+			AddResult(new Result(r.FaceValue+delta,r.Chances));
 		}
 	}
 
