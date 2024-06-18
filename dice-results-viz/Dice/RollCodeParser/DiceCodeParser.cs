@@ -196,12 +196,15 @@ namespace Dice.RollCodeParser
 				existingDRE.Drop = ParseNextToken(null);
 				return existingDRE;
 			}
-			
-			var dre = new DiceRollExpression();
-			//consume the sep
+
 			_pos++;
-			dre.NumberDice = left;
-			dre.NumberFaces = ParseNextToken(null);
+			var dre = new DiceRollExpression()
+			{
+				NumberDice = left,
+				NumberFaces = ParseNextToken(null),
+			};
+			//consume the sep
+			
 			return dre;
 		}
 

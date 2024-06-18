@@ -145,4 +145,9 @@ public class DiceRoll
 			AddResult(new Result(r.FaceValue * value));
 		}
 	}
+
+	public void SetTo(DiceRoll other)
+	{
+		_faceMap = other._faceMap;
+	}
 }

@@ -6,6 +6,22 @@ namespace Dice.RollCodeParser
 	{
 		public string Label;
 		public List<Expression> Expressions = new List<Expression>();
+
+		public ExpressionGroup()
+		{
+			Expressions = new List<Expression>();
+			Label = "";
+		}
+		public ExpressionGroup(IEnumerable<Expression> exp)
+		{
+			Expressions = new List<Expression>();
+			foreach (var e in exp)
+			{
+				Expressions.Add(e);
+			}
+			Label = "";
+		}
+		
 		public override string ToString()
 		{
 			var s = "(";

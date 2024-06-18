@@ -1,4 +1,5 @@
 ﻿using Dice.RollCodeParser.RollDescription;
+using Sprache;
 
 namespace Dice.RollCodeParser
 {
@@ -16,10 +17,11 @@ namespace Dice.RollCodeParser
 		{
 			this.code = code;
 			var tokens = Tokenize(code);
-			_parser = new DiceCodeParser(tokens);
-			_parser.Parse();
+			// _parser = new DiceCodeParser(tokens);
+			// _parser.Parse();
+			var exp = DiceCodeParserSprache.ExpressionGroup.Parse(code);
 			_evaluator = new Evaluator();
-			Result = _evaluator.Evaluate(_parser.Expressions);
+			Result = _evaluator.Evaluate(exp);
 		}
 		
 		private List<Token> Tokenize(string s)

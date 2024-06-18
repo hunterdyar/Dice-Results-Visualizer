@@ -1,4 +1,5 @@
-﻿using Dice.RollCodeParser.RollDescription;
+﻿using System.ComponentModel;
+using Dice.RollCodeParser.RollDescription;
 
 namespace Dice.RollCodeParser
 {
@@ -6,6 +7,11 @@ namespace Dice.RollCodeParser
 	{
 		public DiceRoll Evaluate(List<Expression> expressions)
 		{
+			if (expressions.Count == 1)
+			{
+				return Evaluate(expressions[0]);
+			}
+			
 			DiceRoll final = new DiceRoll();
 			foreach (var expr in expressions)
 			{ 
@@ -42,8 +48,16 @@ namespace Dice.RollCodeParser
 				DiceRoll subRoll = new DiceRoll();
 				foreach (var expression in group.Expressions)
 				{
-					var newRoll = Evaluate(expression);
-					subRoll.CombineWithOtherRoll(newRoll);
+					if (expression is ModifierExpression mexp)
+					{
+						var e = Evaluate(mexp.Expression);
+						subRoll.CombineWithOtherRoll(e,mexp.Modifier);
+					}
+					else
+					{
+						var newRoll = Evaluate(expression);
+						subRoll.CombineWithOtherRoll(newRoll);
+					}
 				}
 				return subRoll;
 			}else if (exp is NumberExpression num)
