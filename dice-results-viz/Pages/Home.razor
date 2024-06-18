@@ -25,18 +25,30 @@
     <ApexChart @ref="_chart" Title="Result" TItem="Result" Options="_options">
         <ApexPointSeries TItem="Result"
                          Items="SResults"
-                         Name="Odds"
+                         Name="Roll"
                          SeriesType="SeriesType.Bar"
                          XValue="e => e.FaceValue"
                          YValue="e=> e.Odds*100"
         />
     </ApexChart>
+    <ApexChart @ref="_chart2" Title="At Least" TItem="Result" Options="_options">
+        <ApexPointSeries TItem="Result"
+                         Items="SAtLeast"
+                         Name="At Least"
+                         SeriesType="SeriesType.Bar"
+                         XValue="e => e.FaceValue"
+                         YValue="e=> e.Odds*100"
+        />
+    </ApexChart>
+
 </div>
 
 @code {
     public DiceUserInput? UserInput { get; set; }
     public List<Result> SResults;
+    public List<Result> SAtLeast;
     private ApexChart<Result> _chart;
+    private ApexChart<Result> _chart2;
     private ApexChartOptions<Result> _options;
     protected override void OnInitialized()
     {
@@ -66,8 +78,10 @@
         var rc = new RollCode(UserInput.Input);
         //if rc.HasError...
         SResults = rc.Result.GetResults();
-        StateHasChanged();
+        SAtLeast = rc.Result.GetAtLeastResults();
         await _chart.RenderAsync();
+        await _chart2.RenderAsync();
+        StateHasChanged();
     }
 
     public class DiceUserInput

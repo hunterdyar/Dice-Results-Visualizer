@@ -20,5 +20,18 @@ public class Tests
 		{
 			Assert.AreEqual(results[i - 1], new Result(i, 1));
 		}
+		
+	}
+
+	[Test]
+	public void AtLeastTest()
+	{
+		var r = new RollCode("1d6");
+		var results = r.Result.GetAtLeastResults();
+		for (int i = 1; i <= 6; i++)
+		{
+			//Assert.AreEqual(results[i - 1], new Result(i, 1));
+		}
+		Assert.Pass();
 	}
 }

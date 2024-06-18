@@ -31,6 +31,26 @@ public class DiceRoll
 		return results;
 	}
 
+	public List<Result> GetAtLeastResults()
+	{
+		var r = GetResults();
+		var atleast = new List<Result>();
+		//we could speed this up by manually looping through r. it's sorted by face value, so we cna reverse loop through it and add up the rest of i.
+		foreach (var result in r)
+		{
+			var x = new Result(result.FaceValue);
+			x.Chances = r.Where(y => x.FaceValue <= y.FaceValue).Sum(y => y.Chances);
+			atleast.Add(x);
+		}
+
+		int total = TotalImaginaryRollCount();
+		foreach (var a in atleast)
+		{
+			a.Odds = a.Chances/(decimal)total;
+		}
+		atleast.Sort((x, y) => x.FaceValue - y.FaceValue);
+		return atleast;
+	}
 	private void CalculateOdds()
 	{
 		int total = TotalImaginaryRollCount();
