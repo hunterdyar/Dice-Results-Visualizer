@@ -6,9 +6,8 @@ namespace Dice.RollCodeParser
 	public class RollCode
 	{
 		private string code;
-		public List<Expression> Expression => _parser.Expressions; 
+		public Expression Expression; 
 		private List<Token> _tokens;
-		private DiceCodeParser _parser;
 		private Evaluator _evaluator;
 		public DiceRoll Result;
 		delegate int RollDiceDelegate(DiceRollExpression dre);
@@ -17,11 +16,9 @@ namespace Dice.RollCodeParser
 		{
 			this.code = code;
 			var tokens = Tokenize(code);
-			// _parser = new DiceCodeParser(tokens);
-			// _parser.Parse();
-			var exp = DiceCodeParserSprache.ExpressionGroup.Parse(code);
+			Expression = DiceCodeParserSprache.ExpressionGroup.Parse(code);
 			_evaluator = new Evaluator();
-			Result = _evaluator.Evaluate(exp);
+			Result = _evaluator.Evaluate(Expression);
 		}
 		
 		private List<Token> Tokenize(string s)
